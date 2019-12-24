@@ -1,1 +1,2 @@
-create table departments(did number,dname varchar2(20));
+insert into departments values(1,"mareeswari");
+
