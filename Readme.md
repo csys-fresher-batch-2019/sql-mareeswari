@@ -6,13 +6,14 @@
 
 #### Feature1 : List all thriller movies
 
-  create table movies(movie_id number,
-                      movie_name varchar2(100) not null,
-                      released_date date default sysdate,
-                      movie_type varchar2(100) not null,
-                      constraint  movie_id_pk primary key(movie_id),
-                      constraint movie_type_ck check(movie_type in('comedy','action','thriller'))
-                      );
+  create table movies(
+  movie_id number,
+  movie_name varchar2(100) not null,
+  released_date date default sysdate,
+  movie_type varchar2(100) not null,
+  constraint  movie_id_pk primary key(movie_id),
+  constraint movie_type_ck check(movie_type in('comedy','action','thriller'))
+  );
                       
                       
    Query:
