@@ -10,6 +10,8 @@
  * User can view all episodes counts of particular show
  * User can view today episodes for particular show
  * User can view all episodes for all shows
+ * User can view previous watching
+ * User can view the movies by movie ratings
  
 
 #### Feature1 : Register with the app to get in
@@ -156,3 +158,65 @@ Query:
 | coffee with dd 	| 1          	| 02-01-20     	|
 | get set go     	| 3          	| 02-01-20     	|
 | coffee with dd 	| 1          	| 03-01-20     	|
+
+
+#### Feature9 : User can view previous watching
+```sql
+create table users_watching_details_movies(watching_id number,
+                                    last_watching_id number not null,
+                                    last_viewing_date date default sysdate,
+                                    user_id number not null unique,
+                                    constraint watching_id_pk primary key(watching_id),
+                                    constraint user_id_fk foreign key(user_id) references users(user_id) ,
+                                    constraint last_watching_id_fk foreign key(last_watching_id ) references movies(movie_id)
+                                    );
+insert into users_watching_details_movies(watching_id,last_watching_id,user_id)values (watching_id_sq.nextval,1,2);
+insert into users_watching_details_movies(watching_id,last_watching_id,user_id)values (watching_id_sq.nextval,1,1);
+
+update users_watching_details_movies set last_viewing_date=sysdate, last_watching_id=2 where user_id=2;
+
+
+  ```
+  Query:
+   select movie_name,movie_director from movies where movie_id=(select last_watching_id from users_watching_details_movies where user_id=(select user_id from users where email='mareesrengan@gmail.com'));
+
+| movie_name              	| movie_director 	|
+|-------------------------	|----------------	|
+| chekka chivantha vaanam 	| mani rathnam   	|
+
+#### Feature10 : User can view the movies by movie ratings
+```sql
+create table movie_ratings (ratings_id number,
+                            movie_id number ,
+                            user_id number,
+                            ratings number not null,
+                            rating_date date default sysdate ,
+                            constraint ratings_id_pk primary key (ratings_id),
+                            constraint user_id_fk2 foreign key(user_id) references users(user_id),
+                            constraint movie_id foreign key (movie_id) references movies(movie_id)
+                            );
+insert into movie_ratings (ratings_id,user_id,movie_id,ratings) values(movie_ratings_id.nextval,1,1,2);
+insert into movie_ratings (ratings_id,user_id,movie_id,ratings) values(movie_ratings_id.nextval,2,1,3);
+insert into movie_ratings (ratings_id,user_id,movie_id,ratings) values(movie_ratings_id.nextval,3,1,4);
+
+update movies set movie_ratings =find_min_ratings(1) where movie_id=1;
+
+CREATE OR REPLACE FUNCTION FIND_MIN_RATINGS 
+(
+  M_ID IN NUMBER 
+) RETURN NUMBER AS max_rating number;
+BEGIN
+  select max(ratings) into max_rating from movie_ratings where movie_id=M_ID;
+
+  RETURN max_rating;
+END FIND_MIN_RATINGS;
+
+  ```
+  Query:
+  select movie_id,movie_name,movie_director,movie_language,movie_ratings from movies order by movie_ratings DESC;
+  
+| movie_id 	| movie_name              	| movie_director 	| movie_language 	| movie_ratings 	|
+|----------	|-------------------------	|----------------	|----------------	|---------------	|
+| 1        	| vaanam                  	| krish          	| tamil          	| 4             	|
+| 3        	| magili                  	| shiva          	| telugu         	| 1             	|
+| 2        	| chekka chivantha vaanam 	| mani rathnam   	| tamil          	| 1             	|
